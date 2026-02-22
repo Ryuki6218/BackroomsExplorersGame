@@ -1,5 +1,5 @@
 import { useBox } from '@react-three/cannon';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { Car } from './Car';
 import { Crate } from './Crate';
@@ -147,6 +147,7 @@ export const Level1 = () => {
     const texture = useConcreteTexture();
     const { setIsLoading } = useGameStore();
     const [chunkId, setChunkId] = useState(0);
+    const lastTransitionTime = useRef(0);
 
     const layout = useMemo(() => {
         const floorPlanes = [];
@@ -272,6 +273,9 @@ export const Level1 = () => {
     }, [texture, chunkId]);
 
     const handleTransition = () => {
+        const now = Date.now();
+        if (now - lastTransitionTime.current < 10000) return; // 10秒クールダウン
+        lastTransitionTime.current = now;
         setIsLoading(true);
         setTimeout(() => {
             setChunkId(prev => prev + 1);
